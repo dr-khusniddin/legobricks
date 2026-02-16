@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegoBricks - Каталог</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LegoBricks" style="height: 50px;">
+                </a>
+            </div>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Главная</a></li>
+                <li><a href="{{ url_for('catalog') }}">Каталог</a></li>
+                <li><a href="{{ url_for('about') }}">О нас</a></li>
+                <li><a href="{{ url_for('cart') }}" class="cart-icon">🛒 <span id="cart-count">0</span></a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Каталог LEGO-кирпичей</h1>
+
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">Все</button>
+            <button class="filter-btn" data-filter="beige">Бежевые</button>
+            <button class="filter-btn" data-filter="brown">Коричневые</button>
+            <button class="filter-btn" data-filter="black">Чёрные</button>
+            <button class="filter-btn" data-filter="red">Красные</button>
+            <button class="filter-btn" data-filter="gray">Серые</button>
+            <button class="filter-btn" data-filter="yellow">Жёлтые</button>
+        </div>
+
+        <div class="catalog-grid">
+            {% for brick in bricks %}
+            <div class="brick-card" data-color="{{ brick.color.split('_')[0] }}">
+                <img src="{{ url_for('static', filename='images/' + brick.image) }}"
+                     alt="{{ brick.name }}"
+                     style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px;">
+                <h3>{{ brick.name }}</h3>
+                <p>240x120x65 мм</p>
+                <div class="brick-price">{{ brick.price }} сум</div>
+                <div class="brick-actions">
+                    <button class="btn add-to-cart" data-id="{{ brick.id }}">В корзину</button>
+                    <a href="{{ url_for('product', product_id=brick.id) }}" class="btn btn-outline">Подробнее</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>LegoBricks</h4>
+                <p>Магазин качественных LEGO-кирпичей в Ташкенте</p>
+            </div>
+            <div class="footer-section">
+                <h4>Навигация</h4>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Главная</a></li>
+                    <li><a href="{{ url_for('catalog') }}">Каталог</a></li>
+                    <li><a href="{{ url_for('about') }}">О нас</a></li>
+                    <li><a href="{{ url_for('cart') }}">Корзина</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p>г. Ташкент, Мирзо-Улугбекский район, ул. БИЙ 434</p>
+                <p>Тел: +998910010013</p>
+                <p>Email: info@legobricks.uz</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 LegoBricks. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        function updateCartCount() {
+            fetch('/api/cart/count')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('cart-count').textContent = data.count;
+                });
+        }
+        updateCartCount();
+    </script>
+</body>
+</html>

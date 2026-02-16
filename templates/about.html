@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegoBricks - О нас</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LegoBricks" style="height: 50px;">
+                </a>
+            </div>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Главная</a></li>
+                <li><a href="{{ url_for('catalog') }}">Каталог</a></li>
+                <li><a href="{{ url_for('about') }}">О нас</a></li>
+                <li><a href="{{ url_for('cart') }}" class="cart-icon">🛒 <span id="cart-count">0</span></a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="about-hero">
+            <h1>О компании LegoBricks</h1>
+            <p>Ваш надёжный партнёр в мире строительных блоков</p>
+        </section>
+
+        <section class="about-story">
+            <div class="story-content">
+                <h2>Более 5 лет на рынке Узбекистана и Центральной Азии</h2>
+                <p>С 2020 года мы радуем наших клиентов качественными, прочными и эстетичными LEGO-кирпичами. За это время мы стали одним из ведущих поставщиков строительных блоков в регионе.</p>
+                <p>Наша продукция используется в частном и коммерческом строительстве, ландшафтном дизайне и декоративных проектах. Мы гордимся доверием тысяч клиентов и продолжаем развиваться, предлагая лучшие решения для вашего строительства.</p>
+            </div>
+            <div class="story-image">
+                <div style="background: linear-gradient(135deg, #0a0a0a, #1a1a1a); width: 100%; height: 300px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                    🧱 5+
+                </div>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="stat-card">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">Довольных клиентов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">10+</div>
+                <div class="stat-label">Цветов и фактур</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">5 лет</div>
+                <div class="stat-label">На рынке Узбекистана</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Поддержка</div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>LegoBricks</h4>
+                <p>Магазин качественных LEGO-кирпичей в Ташкенте</p>
+            </div>
+            <div class="footer-section">
+                <h4>Навигация</h4>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Главная</a></li>
+                    <li><a href="{{ url_for('catalog') }}">Каталог</a></li>
+                    <li><a href="{{ url_for('about') }}">О нас</a></li>
+                    <li><a href="{{ url_for('cart') }}">Корзина</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p>г. Ташкент, Мирзо-Улугбекский район, ул. БИЙ 434</p>
+                <p>Тел: +998910010013</p>
+                <p>Email: info@legobricks.uz</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 LegoBricks. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        function updateCartCount() {
+            fetch('/api/cart/count')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('cart-count').textContent = data.count;
+                });
+        }
+        updateCartCount();
+    </script>
+</body>
+</html>

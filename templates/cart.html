@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegoBricks - Корзина</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LegoBricks" style="height: 50px;">
+                </a>
+            </div>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Главная</a></li>
+                <li><a href="{{ url_for('catalog') }}">Каталог</a></li>
+                <li><a href="{{ url_for('about') }}">О нас</a></li>
+                <li><a href="{{ url_for('cart') }}" class="cart-icon">🛒 <span id="cart-count">{{ cart|sum(attribute='quantity') }}</span></a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Корзина</h1>
+
+        {% if cart %}
+        <div class="cart-container">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Цена</th>
+                        <th>Количество</th>
+                        <th>Сумма</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart %}
+                    <tr data-id="{{ item.id }}">
+                        <td class="cart-product">
+                            <img src="{{ url_for('static', filename='images/' + item.image) }}" alt="{{ item.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px;">
+                            <span>{{ item.name }}</span>
+                        </td>
+                        <td>{{ item.price }} сум</td>
+                        <td>
+                            <input type="number" class="cart-quantity" value="{{ item.quantity }}" min="1" style="width: 60px; padding: 5px;">
+                        </td>
+                        <td class="item-total">{{ item.total }} сум</td>
+                        <td>
+                            <button class="btn-remove" style="background: none; border: none; color: #c41e3a; font-size: 1.2rem; cursor: pointer;">✖</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="cart-summary">
+                <h3>Итого: <span id="cart-total">{{ total }} сум</span></h3>
+                <button class="btn btn-large" id="checkout-btn">Оформить заказ</button>
+                <button class="btn btn-outline" id="clear-cart-btn">Очистить корзину</button>
+            </div>
+        </div>
+
+        <div id="checkout-form" style="display: none; margin-top: 40px;">
+            <h2>Оформление заказа</h2>
+            <form id="order-form">
+                <div style="margin-bottom: 15px;">
+                    <label>Ваше имя:</label><br>
+                    <input type="text" name="name" required style="width: 100%; padding: 10px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Телефон:</label><br>
+                    <input type="tel" name="phone" required style="width: 100%; padding: 10px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Email (необязательно):</label><br>
+                    <input type="email" name="email" style="width: 100%; padding: 10px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Комментарий к заказу:</label><br>
+                    <textarea name="comment" rows="4" style="width: 100%; padding: 10px;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-large">Отправить заказ</button>
+            </form>
+        </div>
+
+        {% else %}
+        <div style="text-align: center; padding: 60px;">
+            <p style="font-size: 1.5rem;">🛒 Корзина пуста</p>
+            <a href="{{ url_for('catalog') }}" class="btn" style="margin-top: 20px;">Перейти в каталог</a>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>LegoBricks</h4>
+                <p>Магазин качественных LEGO-кирпичей в Ташкенте</p>
+            </div>
+            <div class="footer-section">
+                <h4>Навигация</h4>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Главная</a></li>
+                    <li><a href="{{ url_for('catalog') }}">Каталог</a></li>
+                    <li><a href="{{ url_for('about') }}">О нас</a></li>
+                    <li><a href="{{ url_for('cart') }}">Корзина</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p>г. Ташкент, Мирзо-Улугбекский район, ул. БИЙ 434</p>
+                <p>Тел: +998910010013</p>
+                <p>Email: info@legobricks.uz</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 LegoBricks. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Обновление количества
+        document.querySelectorAll('.cart-quantity').forEach(input => {
+            input.addEventListener('change', function() {
+                const row = this.closest('tr');
+                const id = parseInt(row.dataset.id);
+                const quantity = parseInt(this.value);
+
+                fetch('/api/cart/update', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: id, quantity: quantity})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                });
+            });
+        });
+
+        // Удаление товара
+        document.querySelectorAll('.btn-remove').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const id = parseInt(row.dataset.id);
+
+                fetch('/api/cart/update', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: id, quantity: 0})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                });
+            });
+        });
+
+        // Очистить корзину
+        document.getElementById('clear-cart-btn')?.addEventListener('click', function() {
+            if (confirm('Очистить корзину?')) {
+                fetch('/api/cart/clear', {method: 'POST'})
+                .then(() => location.reload());
+            }
+        });
+
+        // Показать форму заказа
+        document.getElementById('checkout-btn')?.addEventListener('click', function() {
+            document.getElementById('checkout-form').style.display = 'block';
+            this.style.display = 'none';
+        });
+
+        // Отправка заказа
+        document.getElementById('order-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            alert('Спасибо за заказ! Мы свяжемся с вами в ближайшее время.');
+
+            fetch('/api/cart/clear', {method: 'POST'})
+                .then(() => {
+                    window.location.href = "{{ url_for('catalog') }}";
+                });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegoBricks - {{ brick.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LegoBricks" style="height: 50px;">
+                </a>
+            </div>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Главная</a></li>
+                <li><a href="{{ url_for('catalog') }}">Каталог</a></li>
+                <li><a href="{{ url_for('about') }}">О нас</a></li>
+                <li><a href="{{ url_for('cart') }}" class="cart-icon">🛒 <span id="cart-count">0</span></a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="product-page">
+            <div class="product-gallery">
+                <img src="{{ url_for('static', filename='images/' + brick.image) }}"
+                     alt="{{ brick.name }}"
+                     style="width: 100%; border-radius: 15px;">
+            </div>
+
+            <div class="product-info">
+                <h1>{{ brick.name }}</h1>
+                <p class="product-dim">240x120x65 мм</p>
+                <div class="product-price">{{ brick.price }} сум</div>
+
+                <div class="product-description">
+                    <h3>Описание</h3>
+                    <p>Качественный облицовочный LEGO-кирпич. Идеально подходит для строительства.</p>
+                </div>
+
+                <div class="product-actions">
+                    <button class="btn btn-large add-to-cart" data-id="{{ brick.id }}">В корзину</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>...</footer>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>function updateCartCount(){fetch('/api/cart/count').then(res=>res.json()).then(data=>{document.getElementById('cart-count').textContent=data.count})}updateCartCount();</script>
+</body>
+</html>
