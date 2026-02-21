@@ -3,11 +3,14 @@ import os
 import requests
 
 app = Flask(__name__)
-app.secret_key = 'legobricks_secret_key_2026'
+app.secret_key = os.environ.get('SECRET_KEY', 'legobricks_secret_key_2026')
 
-# ========== TELEGRAM ==========
-TELEGRAM_TOKEN = '7234567890:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw'  # ЗАМЕНИ!
-TELEGRAM_CHAT_ID = '123456789'  # ЗАМЕНИ!
+# Разрешаем все хосты (для работы с доменом legobricks.uz)
+app.config['SERVER_NAME'] = None  # Важно! Не привязываемся к конкретному домену
+
+# ========== TELEGRAM (из переменных окружения) ==========
+TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN', '')
+TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '')
 
 # Товары
 bricks = [
@@ -132,12 +135,16 @@ def cart_count():
 # ========== ЗАКАЗ ==========
 
 def send_telegram_message(message):
+    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
+        print("Telegram токен не настроен!")
+        return
+    
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     data = {'chat_id': TELEGRAM_CHAT_ID, 'text': message, 'parse_mode': 'HTML'}
     try:
         requests.post(url, data=data)
-    except:
-        pass
+    except Exception as e:
+        print(f"Ошибка отправки в Telegram: {e}")
 
 @app.route('/api/order/submit', methods=['POST'])
 def submit_order():
@@ -170,6 +177,5 @@ def submit_order():
     return jsonify({'success': True})
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
